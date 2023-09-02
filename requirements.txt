@@ -1,0 +1,9 @@
+autocorrect==2.6.1
+keyboard==0.13.5
+numpy==1.25.2
+Pillow==10.0.0
+pypiwin32==223
+pywin32==306
+six==1.16.0
+win10toast==0.9
+wxPython==4.2.1
