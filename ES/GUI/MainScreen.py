@@ -19,7 +19,7 @@ class window(wx.Frame):
 			(wx.ACCEL_CTRL, ord("Q"), quit.GetId())
 		])
 		self.SetAcceleratorTable(table)
-		menuBar.Append(mainMenu,"Main menu")
+		menuBar.Append(mainMenu,"Options")
 		about=wx.Menu()
 		help=about.Append(-1,"Quick help\tF1")
 		info=about.Append(-1,"About the program")
