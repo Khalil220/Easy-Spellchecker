@@ -2,11 +2,12 @@ import wx
 from Functions.spellcheck import speller
 class dialog(wx.Dialog):
 	def __init__(self,parent):
-		wx.Dialog.__init__(self,parent,title="Check a word")
+		super().__init__(parent,title="Check a word")
 		self.Center()
 		self.SetSize(wx.DisplaySize())
 		self.Maximize(True)
 		self.panel=wx.Panel(self)
+		self.choices=[]
 		input=wx.StaticText(self.panel,-1,"&Type the word here",name="userInput")
 		self.uinput=wx.TextCtrl(self.panel,-1,name="userInput")
 		self.uinput.SetFocus()

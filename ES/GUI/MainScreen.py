@@ -5,10 +5,9 @@ import EasySpellchecker
 from . import SecondaryScreen as sc
 class window(wx.Frame):
 	def __init__(self):
-		wx.Frame.__init__(self,parent=None,title="Easy Spellchecker")
+		super().__init__(parent=None,title="Easy Spellchecker")
 		self.Centre()
 		self.SetSize(wx.DisplaySize())
-		#self.Maximize(True)
 		panel=wx.Panel(self)
 		menuBar=wx.MenuBar()
 		mainMenu=wx.Menu()
@@ -19,7 +18,7 @@ class window(wx.Frame):
 			(wx.ACCEL_CTRL, ord("Q"), quit.GetId())
 		])
 		self.SetAcceleratorTable(table)
-		menuBar.Append(mainMenu,"Options")
+		menuBar.Append(mainMenu,"Main menu")
 		about=wx.Menu()
 		help=about.Append(-1,"Quick help\tF1")
 		info=about.Append(-1,"About the program")
