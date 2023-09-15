@@ -7,7 +7,6 @@ class dialog(wx.Dialog):
 		self.SetSize(wx.DisplaySize())
 		self.Maximize(True)
 		self.panel=wx.Panel(self)
-		self.choices=[]
 		input=wx.StaticText(self.panel,-1,"&Type the word here",name="userInput")
 		self.uinput=wx.TextCtrl(self.panel,-1,name="userInput")
 		self.uinput.SetFocus()
