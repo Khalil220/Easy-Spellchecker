@@ -35,6 +35,13 @@ class SpellcheckerApp(wx.App):
 
     def OnInit(self) -> bool:
         configure_logging(self._log_dir)
+        if sys.platform == "win32":
+            try:
+                import ctypes
+
+                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(APP_NAME)
+            except Exception:
+                self.logger.warning("Failed to set AppUserModelID.")
         self.logger.info("Starting Easy Spellchecker")
         self._first_close_notified = False
         self.spellchecker = SymSpellChecker()
