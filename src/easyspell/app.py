@@ -40,7 +40,7 @@ class SpellcheckerApp(wx.App):
         self.spellchecker = SymSpellChecker()
         self.hidden_frame = wx.Frame(None)
         self.hidden_frame.Hide()
-        self.notifier = Notifier(APP_NAME, find_icon(self.asset_dir))
+        self.notifier = Notifier(APP_NAME, find_icon(self.asset_dir), app_id=APP_NAME)
         self.main_frame = MainFrame(self.spellchecker, self._handle_main_close)
         self.main_frame.Show()
         self.main_frame.focus_input()
@@ -144,16 +144,24 @@ class SpellcheckerApp(wx.App):
 
 
 def run(argv: Optional[list[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Easy Spellchecker application")
-    parser.add_argument("--log-dir", type=str, default=None)
-    args = parser.parse_args(argv)
+	parser = argparse.ArgumentParser(description="Easy Spellchecker application")
+	parser.add_argument("--log-dir", type=str, default=None)
+	args = parser.parse_args(argv)
 
-    log_dir = Path(args.log_dir) if args.log_dir else None
-    configure_logging(log_dir)
-    logging.getLogger(__name__).info("Easy Spellchecker logging initialised")
+	log_dir = Path(args.log_dir) if args.log_dir else None
+	configure_logging(log_dir)
+	logging.getLogger(__name__).info("Easy Spellchecker logging initialised")
 
-    app = SpellcheckerApp(log_dir)
-    return app.MainLoop()
+	if sys.platform == "win32":
+		try:
+			import ctypes
+
+			ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(APP_NAME)
+		except Exception:
+			logging.getLogger(__name__).warning("Failed to set AppUserModelID for notifications")
+
+	app = SpellcheckerApp(log_dir)
+	return app.MainLoop()
 
 
 if __name__ == "__main__":
