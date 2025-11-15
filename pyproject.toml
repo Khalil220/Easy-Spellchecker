@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "easyspell"
+version = "0.1.0"
+description = "Accessible spell checking tray companion for Windows"
+authors = [{name="Easy Spellchecker"}]
+license = {text = "MIT License"}
+dependencies = [
+    "symspellpy>=6.9",
+    "wxPython>=4.2.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
