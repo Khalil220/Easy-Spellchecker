@@ -37,7 +37,7 @@ class TrayService(wx.App):
 		if not hasattr(self, "logger"):
 			self.logger = logging.getLogger(__name__)
 		configure_logging(self._log_dir)
-		self.logger.info("Starting tray service...")
+		self.logger.info("Starting tray service from %s", self._binary_dir)
 		self.hidden_frame = wx.Frame(None)
 		self.hidden_frame.Hide()
 		self.notifier = Notifier(APP_NAME, find_icon(self._binary_dir))
@@ -56,7 +56,8 @@ class TrayService(wx.App):
 			env_exe = os.environ.get("NUITKA_ONEFILE_EXE")
 			if env_exe:
 				return Path(env_exe).resolve().parent
-			return Path(sys.argv[0]).resolve().parent
+			exe = Path(sys.argv[0]).resolve()
+			return exe.parent
 		return Path(__file__).resolve().parent
 
 	def _register_hotkey(self) -> None:
@@ -112,9 +113,10 @@ class TrayService(wx.App):
 			self.logger.exception("Failed to launch core process")
 
 	def _core_command(self) -> list[str]:
-		exe_path = self._binary_dir / CORE_EXECUTABLE
+		exe_path = (self._binary_dir / CORE_EXECUTABLE).resolve()
 		if exe_path.exists():
 			return [str(exe_path)]
+		self.logger.warning("Packaged core executable not found at %s, falling back to python -m", exe_path)
 		return [sys.executable, "-m", "easyspell.core_app"]
 
 	def shutdown(self) -> None:
