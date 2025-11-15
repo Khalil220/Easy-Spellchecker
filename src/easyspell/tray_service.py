@@ -21,19 +21,22 @@ CORE_EXECUTABLE = "core_app.exe"
 
 class TrayService(wx.App):
 	def __init__(self, log_dir: Optional[Path] = None):
-		super().__init__(redirect=False)
-		self.SetExitOnFrameDelete(False)
-		configure_logging(log_dir)
+		self._log_dir = log_dir
 		self.logger = logging.getLogger(__name__)
-		self.hidden_frame = wx.Frame(None)
-		self.hidden_frame.Hide()
+		self.hidden_frame: Optional[wx.Frame] = None
 		self.hotkey_id: Optional[int] = None
 		self.tray_icon: Optional[wx.adv.TaskBarIcon] = None
 		self.core_process: Optional[subprocess.Popen] = None
-		self.notifier = Notifier(APP_NAME, find_icon(self._base_dir()))
+		self.notifier: Optional[Notifier] = None
+		super().__init__(redirect=False)
+		self.SetExitOnFrameDelete(False)
 
 	def OnInit(self) -> bool:
+		configure_logging(self._log_dir)
 		self.logger.info("Starting tray service...")
+		self.hidden_frame = wx.Frame(None)
+		self.hidden_frame.Hide()
+		self.notifier = Notifier(APP_NAME, find_icon(self._base_dir()))
 		self._register_hotkey()
 		if not self._install_tray_icon():
 			self.logger.error("Unable to install system tray icon. Exiting.")
@@ -53,7 +56,7 @@ class TrayService(wx.App):
 			self.logger.warning("Invalid hotkey %s", HOTKEY)
 			return
 		self.hotkey_id = wx.NewIdRef().GetId()
-		if self.hidden_frame.RegisterHotKey(self.hotkey_id, binding.modifiers, binding.keycode):
+		if self.hidden_frame and self.hidden_frame.RegisterHotKey(self.hotkey_id, binding.modifiers, binding.keycode):
 			self.hidden_frame.Bind(wx.EVT_HOTKEY, lambda evt: self.launch_core(), id=self.hotkey_id)
 			self.logger.info("Registered global hotkey %s", HOTKEY)
 		else:
