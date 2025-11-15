@@ -47,7 +47,7 @@ class SpellcheckerApp(wx.App):
         self.spellchecker = SymSpellChecker()
         self.hidden_frame = wx.Frame(None)
         self.hidden_frame.Hide()
-        self.notifier = Notifier(APP_NAME, find_icon(self.asset_dir), app_id=APP_NAME)
+        self.notifier = Notifier("", find_icon(self.asset_dir), app_id=APP_NAME)
         self.main_frame = MainFrame(self.spellchecker, self._handle_main_close)
         self.main_frame.Show()
         self.main_frame.focus_input()
