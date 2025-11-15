@@ -32,6 +32,8 @@ class TrayService(wx.App):
 		self.SetExitOnFrameDelete(False)
 
 	def OnInit(self) -> bool:
+		if not hasattr(self, "logger"):
+			self.logger = logging.getLogger(__name__)
 		configure_logging(self._log_dir)
 		self.logger.info("Starting tray service...")
 		self.hidden_frame = wx.Frame(None)
