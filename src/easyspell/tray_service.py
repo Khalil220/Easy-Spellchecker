@@ -21,6 +21,10 @@ CORE_EXECUTABLE = "core_app.exe"
 
 class TrayService(wx.App):
 	def __init__(self, log_dir: Optional[Path] = None):
+		if getattr(sys, "frozen", False):
+			self._binary_dir = Path(sys.argv[0]).resolve().parent
+		else:
+			self._binary_dir = Path(__file__).resolve().parent
 		self._log_dir = log_dir
 		self.logger = logging.getLogger(__name__)
 		self.hidden_frame: Optional[wx.Frame] = None
@@ -46,10 +50,8 @@ class TrayService(wx.App):
 		wx.CallAfter(lambda: self.notifier.show(STARTUP_NOTIFICATION))
 		return True
 
-	def _base_dir(self) -> Optional[Path]:
-		if getattr(sys, "frozen", False):
-			return Path(sys.argv[0]).resolve().parent
-		return Path(__file__).resolve().parent
+	def _base_dir(self) -> Path:
+		return self._binary_dir
 
 	def _register_hotkey(self) -> None:
 		try:
@@ -104,11 +106,9 @@ class TrayService(wx.App):
 			self.logger.exception("Failed to launch core process")
 
 	def _core_command(self) -> list[str]:
-		base = self._base_dir()
-		if base:
-			exe_path = base / CORE_EXECUTABLE
-			if exe_path.exists():
-				return [str(exe_path)]
+		exe_path = self._base_dir() / CORE_EXECUTABLE
+		if exe_path.exists():
+			return [str(exe_path)]
 		return [sys.executable, "-m", "easyspell.core_app"]
 
 	def shutdown(self) -> None:
