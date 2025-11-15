@@ -74,7 +74,7 @@ class MainFrame(wx.Frame):
 		self.results.SetFocus()
 
 	def _format_suggestion(self, suggestion: Suggestion) -> str:
-		return f"{suggestion.term} (edits {suggestion.distance}, freq {suggestion.frequency})"
+		return f"{suggestion.term} (edits {suggestion.distance})"
 
 	def _show_quick_help(self) -> None:
 		message = "Type a word, press Enter or the Check button, then review suggestions in the list."
