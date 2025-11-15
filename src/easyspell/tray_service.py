@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -21,10 +22,7 @@ CORE_EXECUTABLE = "core_app.exe"
 
 class TrayService(wx.App):
 	def __init__(self, log_dir: Optional[Path] = None):
-		if getattr(sys, "frozen", False):
-			self._binary_dir = Path(sys.argv[0]).resolve().parent
-		else:
-			self._binary_dir = Path(__file__).resolve().parent
+		self._binary_dir = self._resolve_binary_dir()
 		self._log_dir = log_dir
 		self.logger = logging.getLogger(__name__)
 		self.hidden_frame: Optional[wx.Frame] = None
@@ -42,7 +40,7 @@ class TrayService(wx.App):
 		self.logger.info("Starting tray service...")
 		self.hidden_frame = wx.Frame(None)
 		self.hidden_frame.Hide()
-		self.notifier = Notifier(APP_NAME, find_icon(self._base_dir()))
+		self.notifier = Notifier(APP_NAME, find_icon(self._binary_dir))
 		self._register_hotkey()
 		if not self._install_tray_icon():
 			self.logger.error("Unable to install system tray icon. Exiting.")
@@ -50,8 +48,16 @@ class TrayService(wx.App):
 		wx.CallAfter(lambda: self.notifier.show(STARTUP_NOTIFICATION))
 		return True
 
-	def _base_dir(self) -> Path:
-		return self._binary_dir
+	def _resolve_binary_dir(self) -> Path:
+		if getattr(sys, "frozen", False):
+			env_parent = os.environ.get("NUITKA_ONEFILE_PARENT")
+			if env_parent:
+				return Path(env_parent)
+			env_exe = os.environ.get("NUITKA_ONEFILE_EXE")
+			if env_exe:
+				return Path(env_exe).resolve().parent
+			return Path(sys.argv[0]).resolve().parent
+		return Path(__file__).resolve().parent
 
 	def _register_hotkey(self) -> None:
 		try:
@@ -71,7 +77,7 @@ class TrayService(wx.App):
 			def __init__(self, outer: TrayService):
 				super().__init__()
 				self.outer = outer
-				icon_path = find_icon(outer._base_dir())
+				icon_path = find_icon(outer._binary_dir)
 				if icon_path and icon_path.exists():
 					icon = wx.Icon(str(icon_path))
 				else:
@@ -106,7 +112,7 @@ class TrayService(wx.App):
 			self.logger.exception("Failed to launch core process")
 
 	def _core_command(self) -> list[str]:
-		exe_path = self._base_dir() / CORE_EXECUTABLE
+		exe_path = self._binary_dir / CORE_EXECUTABLE
 		if exe_path.exists():
 			return [str(exe_path)]
 		return [sys.executable, "-m", "easyspell.core_app"]
