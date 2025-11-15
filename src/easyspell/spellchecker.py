@@ -16,6 +16,7 @@ class Suggestion:
 
 class SymSpellChecker:
 	def __init__(self, max_edit_distance: int = 2, prefix_length: int = 7):
+		self.max_edit_distance = max_edit_distance
 		self._symspell = SymSpell(max_dictionary_edit_distance=max_edit_distance, prefix_length=prefix_length)
 		self._load_default_dictionaries()
 
@@ -29,11 +30,15 @@ class SymSpellChecker:
 		term = (text or "").strip()
 		if not term:
 			return []
-		lookup: Iterable = (
-			self._symspell.lookup_compound(term)
-			if " " in term
-			else self._symspell.lookup(term, verbosity=Verbosity.CLOSEST, transfer_casing=True)
-		)
+		if " " in term:
+			lookup = self._symspell.lookup_compound(term, max_edit_distance=self.max_edit_distance)
+		else:
+			lookup = self._symspell.lookup(
+				term,
+				verbosity=Verbosity.CLOSEST,
+				transfer_casing=True,
+				max_edit_distance=self.max_edit_distance,
+			)
 		results = [Suggestion(item.term, item.distance, item.count) for item in lookup]
 		return results[:max_results]
 
