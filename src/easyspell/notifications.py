@@ -8,7 +8,7 @@ import wx.adv
 
 
 class Notifier:
-	def __init__(self, title: str, icon_path: Optional[Path] = None, app_id: Optional[str] = None):
+	def __init__(self, title: Optional[str] = None, icon_path: Optional[Path] = None, app_id: Optional[str] = None):
 		self.title = title
 		self.icon_path = icon_path
 		self.app_id = app_id
@@ -19,11 +19,9 @@ class Notifier:
 		app = wx.GetApp()
 		if app is None:
 			return
-		note = wx.adv.NotificationMessage(self.title, message)
+		note = wx.adv.NotificationMessage(self.title or "", message)
 		if self.icon_path and self.icon_path.exists():
 			note.SetIcon(wx.Icon(str(self.icon_path)))
 		else:
 			note.SetIcon(wx.ArtProvider.GetIcon(wx.ART_INFORMATION, wx.ART_OTHER, (32, 32)))
-		if self.app_id and hasattr(note, "UseTaskBarIcon"):
-			note.SetTitle(self.app_id)
 		note.Show()
