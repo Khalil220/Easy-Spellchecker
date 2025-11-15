@@ -34,7 +34,7 @@ popd
 exit /b %errorlevel%
 
 :build_app
-"%VENV_PY%" -m nuitka --standalone %PACKAGE_SWITCH% --include-data-dir="ES\Icons=Icons" --output-dir="%OUT_DIR%" src\easyspell\app.py || goto :error
+"%VENV_PY%" -m nuitka --standalone %PACKAGE_SWITCH% --output-dir="%OUT_DIR%" src\easyspell\app.py || goto :error
 call :cleanup app
 exit /b 0
 :error
@@ -42,6 +42,6 @@ exit /b 1
 
 :cleanup
 set "BASE=%~1"
-if exist "%OUT_DIR%\%BASE%.dist" rmdir /s /q "%OUT_DIR%\%BASE%.dist"
 if exist "%OUT_DIR%\%BASE%.build" rmdir /s /q "%OUT_DIR%\%BASE%.build"
+if exist "%OUT_DIR%\%BASE%.dist\core_app.exe" del /f /q "%OUT_DIR%\%BASE%.dist\core_app.exe"
 exit /b 0
