@@ -20,29 +20,14 @@ class MainFrame(wx.Frame):
 
 	def _create_menu(self) -> None:
 		menu_bar = wx.MenuBar()
-
-		file_menu = wx.Menu()
-		check_item = file_menu.Append(wx.ID_ANY, "&Check word\tCtrl+N")
-		exit_item = file_menu.Append(wx.ID_EXIT, "E&xit\tCtrl+Q")
-		menu_bar.Append(file_menu, "&File")
-
 		help_menu = wx.Menu()
+		help_item = help_menu.Append(wx.ID_HELP, "&Quick help\tF1")
 		about_item = help_menu.Append(wx.ID_ABOUT, "&About")
 		menu_bar.Append(help_menu, "&Help")
-
 		self.SetMenuBar(menu_bar)
-
-		self.Bind(wx.EVT_MENU, lambda evt: self._run_spellcheck(), check_item)
-		self.Bind(wx.EVT_MENU, lambda evt: self._close(), exit_item)
+		self.Bind(wx.EVT_MENU, lambda evt: self._show_quick_help(), help_item)
 		self.Bind(wx.EVT_MENU, lambda evt: self._show_about(), about_item)
-
-		accelerators = wx.AcceleratorTable(
-			[
-				(wx.ACCEL_CTRL, ord("N"), check_item.GetId()),
-				(wx.ACCEL_CTRL, ord("Q"), exit_item.GetId()),
-			]
-		)
-		self.SetAcceleratorTable(accelerators)
+		self.Bind(wx.EVT_CHAR_HOOK, self._handle_char_hook)
 
 	def _build_ui(self) -> None:
 		panel = wx.Panel(self)
@@ -70,7 +55,7 @@ class MainFrame(wx.Frame):
 		sizer.Add(self.status, 0, wx.ALL, 10)
 
 		panel.SetSizer(sizer)
-		self.input.SetFocus()
+		self.focus_input()
 
 	def _run_spellcheck(self) -> None:
 		text = self.input.GetValue()
@@ -91,9 +76,23 @@ class MainFrame(wx.Frame):
 	def _format_suggestion(self, suggestion: Suggestion) -> str:
 		return f"{suggestion.term} (edits {suggestion.distance}, freq {suggestion.frequency})"
 
+	def _show_quick_help(self) -> None:
+		message = "Type a word, press Enter or the Check button, then review suggestions in the list."
+		wx.MessageBox(message, "Quick help", parent=self)
+
 	def _show_about(self) -> None:
 		message = "Accessible Windows spell checker built with SymSpell and wxPython."
 		wx.MessageBox(message, "About", parent=self)
+
+	def focus_input(self) -> None:
+		if self.input:
+			self.input.SetFocus()
+
+	def _handle_char_hook(self, event: wx.KeyEvent) -> None:
+		if event.GetKeyCode() == wx.WXK_F1:
+			self._show_quick_help()
+		else:
+			event.Skip()
 
 	def _close(self) -> None:
 		self.Close()

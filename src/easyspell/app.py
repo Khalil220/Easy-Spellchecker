@@ -20,9 +20,8 @@ from easyspell.spellchecker import SymSpellChecker
 
 
 class SpellcheckerApp(wx.App):
-    def __init__(self, log_dir: Optional[Path], start_visible: bool = False):
+    def __init__(self, log_dir: Optional[Path]):
         self._log_dir = log_dir
-        self.start_visible = start_visible
         self.logger = logging.getLogger(__name__)
         self.hidden_frame: Optional[wx.Frame] = None
         self.hotkey_id: Optional[int] = None
@@ -37,22 +36,20 @@ class SpellcheckerApp(wx.App):
     def OnInit(self) -> bool:
         configure_logging(self._log_dir)
         self.logger.info("Starting Easy Spellchecker")
+        self._first_close_notified = False
         self.spellchecker = SymSpellChecker()
         self.hidden_frame = wx.Frame(None)
         self.hidden_frame.Hide()
         self.notifier = Notifier(APP_NAME, find_icon(self.asset_dir))
         self.main_frame = MainFrame(self.spellchecker, self._handle_main_close)
-        self.main_frame.Hide()
+        self.main_frame.Show()
+        self.main_frame.focus_input()
 
         self._register_hotkey()
         if not self._create_tray_icon():
             self.logger.error("Unable to install tray icon; exiting")
             return False
 
-        if self.start_visible:
-            wx.CallAfter(self.show_main_window)
-
-        wx.CallAfter(lambda: self.notifier.show(STARTUP_NOTIFICATION))
         return True
 
     def _asset_directory(self) -> Path:
@@ -114,7 +111,7 @@ class SpellcheckerApp(wx.App):
         self.main_frame.Show()
         self.main_frame.Raise()
         self.main_frame.RequestUserAttention()
-        self.main_frame.SetFocus()
+        self.main_frame.focus_input()
 
     def hide_main_window(self) -> None:
         if self.main_frame and self.main_frame.IsShown():
@@ -124,6 +121,9 @@ class SpellcheckerApp(wx.App):
         if event.CanVeto():
             event.Veto()
         self.hide_main_window()
+        if not self._first_close_notified and self.notifier:
+            self.notifier.show(STARTUP_NOTIFICATION)
+            self._first_close_notified = True
 
     def shutdown(self) -> None:
         self.logger.info("Shutting down Easy Spellchecker")
@@ -146,14 +146,13 @@ class SpellcheckerApp(wx.App):
 def run(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Easy Spellchecker application")
     parser.add_argument("--log-dir", type=str, default=None)
-    parser.add_argument("--show", action="store_true", help="Show the window immediately on launch")
     args = parser.parse_args(argv)
 
     log_dir = Path(args.log_dir) if args.log_dir else None
     configure_logging(log_dir)
     logging.getLogger(__name__).info("Easy Spellchecker logging initialised")
 
-    app = SpellcheckerApp(log_dir, start_visible=args.show)
+    app = SpellcheckerApp(log_dir)
     return app.MainLoop()
 
 

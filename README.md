@@ -19,7 +19,7 @@ Easy Spellchecker is a screen-reader-first spelling companion for Windows. It ru
    ```
 3. Launch the application (tray + GUI) during development:
    ```bash
-   .venv\Scripts\python -m easyspell.app --show
+   .venv\Scripts\python -m easyspell.app
    ```
 4. Execute tests with `python -m unittest`.
 
