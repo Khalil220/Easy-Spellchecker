@@ -16,9 +16,9 @@ if not exist "%VENV_PY%" (
 	%PYTHON% -m venv "%VENV_DIR%" || goto :teardown
 )
 
-call "%VENV_DIR%\Scripts\pip.exe" install --upgrade pip setuptools wheel >nul || goto :teardown
-call "%VENV_DIR%\Scripts\pip.exe" install -r requirements.txt >nul || goto :teardown
-call "%VENV_DIR%\Scripts\pip.exe" install nuitka >nul || goto :teardown
+call "%VENV_PY%" -m pip install --upgrade pip setuptools wheel || goto :teardown
+call "%VENV_PY%" -m pip install -r requirements.txt || goto :teardown
+call "%VENV_PY%" -m pip install nuitka || goto :teardown
 
 set "OUT_DIR=build\windows"
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
