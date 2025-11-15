@@ -104,8 +104,9 @@ class TrayService(wx.App):
 			self.logger.exception("Failed to launch core process")
 
 	def _core_command(self) -> list[str]:
-		if getattr(sys, "frozen", False):
-			return [str(self._base_dir() / CORE_EXECUTABLE)]
+		exe_path = self._base_dir() / CORE_EXECUTABLE
+		if exe_path.exists():
+			return [str(exe_path)]
 		return [sys.executable, "-m", "easyspell.core_app"]
 
 	def shutdown(self) -> None:
