@@ -56,8 +56,10 @@ class TrayService(wx.App):
 			env_exe = os.environ.get("NUITKA_ONEFILE_EXE")
 			if env_exe:
 				return Path(env_exe).resolve().parent
-			exe = Path(sys.argv[0]).resolve()
-			return exe.parent
+			return Path(sys.argv[0]).resolve().parent
+		local_candidate = Path.cwd() / "build" / "windows"
+		if local_candidate.exists():
+			return local_candidate
 		return Path(__file__).resolve().parent
 
 	def _register_hotkey(self) -> None:
