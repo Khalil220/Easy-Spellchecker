@@ -28,7 +28,11 @@ def run(argv: list[str] | None = None) -> int:
 
 	frame = MainFrame(checker, on_exit)
 	frame.Show()
-	app.MainLoop()
+	try:
+		app.MainLoop()
+	finally:
+		app.Destroy()
+		app = None
 	return 0
 
 

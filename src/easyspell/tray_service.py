@@ -123,6 +123,7 @@ class TrayService(wx.App):
 		if self.hotkey_id is not None:
 			self.hidden_frame.UnregisterHotKey(self.hotkey_id)
 		self.ExitMainLoop()
+		self.Destroy()
 
 
 def main(argv: list[str] | None = None) -> int:
