@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Callable, Optional
+
 import wx
 
 from easyspell.config import APP_NAME
@@ -7,13 +9,14 @@ from easyspell.spellchecker import Suggestion, SymSpellChecker
 
 
 class MainFrame(wx.Frame):
-	def __init__(self, spellchecker: SymSpellChecker, on_exit):
+	def __init__(self, spellchecker: SymSpellChecker, on_close_request: Optional[Callable[[wx.CloseEvent], None]] = None):
 		super().__init__(None, title=APP_NAME, size=(480, 360))
 		self.spellchecker = spellchecker
-		self.on_exit = on_exit
+		self.on_close_request = on_close_request
 		self._create_menu()
 		self._build_ui()
 		self.Centre()
+		self.Bind(wx.EVT_CLOSE, self._handle_close_request)
 
 	def _create_menu(self) -> None:
 		menu_bar = wx.MenuBar()
@@ -93,6 +96,10 @@ class MainFrame(wx.Frame):
 		wx.MessageBox(message, "About", parent=self)
 
 	def _close(self) -> None:
-		self.Destroy()
-		if callable(self.on_exit):
-			self.on_exit()
+		self.Close()
+
+	def _handle_close_request(self, event: wx.CloseEvent) -> None:
+		if callable(self.on_close_request):
+			self.on_close_request(event)
+		else:
+			event.Skip()

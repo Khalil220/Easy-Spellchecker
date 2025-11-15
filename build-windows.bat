@@ -25,8 +25,7 @@ set "OUT_DIR=build\windows"
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 set "PACKAGE_SWITCH=--include-package=easyspell --include-package-data=easyspell --include-package-data=symspellpy"
 
-call :build_core || goto :teardown
-call :build_tray || goto :teardown
+call :build_app || goto :teardown
 
 echo [INFO] Build completed. Executables located in %OUT_DIR%.
 
@@ -34,22 +33,15 @@ echo [INFO] Build completed. Executables located in %OUT_DIR%.
 popd
 exit /b %errorlevel%
 
-:build_core
-"%VENV_PY%" -m nuitka --standalone %PACKAGE_SWITCH% --output-dir="%OUT_DIR%" src\easyspell\core_app.py || goto :error
-call :cleanup core_app
+:build_app
+"%VENV_PY%" -m nuitka --standalone %PACKAGE_SWITCH% --include-data-dir="ES\Icons=Icons" --output-dir="%OUT_DIR%" src\easyspell\app.py || goto :error
+call :cleanup app
 exit /b 0
 :error
 exit /b 1
-
-:build_tray
-"%VENV_PY%" -m nuitka --standalone %PACKAGE_SWITCH% --include-data-file="%OUT_DIR%\core_app.exe=core_app.exe" --output-dir="%OUT_DIR%" src\easyspell\tray_service.py || goto :error
-call :cleanup tray_service
-exit /b 0
 
 :cleanup
 set "BASE=%~1"
 if exist "%OUT_DIR%\%BASE%.dist" rmdir /s /q "%OUT_DIR%\%BASE%.dist"
 if exist "%OUT_DIR%\%BASE%.build" rmdir /s /q "%OUT_DIR%\%BASE%.build"
-if exist "%OUT_DIR%\%BASE%.onefile-build" rmdir /s /q "%OUT_DIR%\%BASE%.onefile-build"
-if exist "%OUT_DIR%\%BASE%.onefile-lock" del /f /q "%OUT_DIR%\%BASE%.onefile-lock"
 exit /b 0

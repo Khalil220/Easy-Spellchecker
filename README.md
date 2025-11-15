@@ -17,18 +17,14 @@ Easy Spellchecker is a screen-reader-first spelling companion for Windows. It ru
    .venv\Scripts\pip install -r requirements.txt
    .venv\Scripts\pip install -e .
    ```
-3. Run the tray service while developing:
+3. Launch the application (tray + GUI) during development:
    ```bash
-   .venv\Scripts\python -m easyspell.tray_service
+   .venv\Scripts\python -m easyspell.app --show
    ```
-4. Launch the core GUI directly for faster iterations:
-   ```bash
-   .venv\Scripts\python -m easyspell.core_app
-   ```
-5. Execute tests with `python -m unittest`.
+4. Execute tests with `python -m unittest`.
 
 ## Building for Windows
-Use `build-windows.bat` to generate self-contained executables (tray + core) via Nuitka. The script installs prerequisites, compiles both binaries, and stores them under `build\windows`.
+Use `build-windows.bat` to produce a standalone build (based on Nuitka). The script installs prerequisites, compiles the application, and places `app.exe` along with its support directory under `build\windows`.
 
 ## License
 This project is released under the MIT License. See [LICENSE](LICENSE) for details.
