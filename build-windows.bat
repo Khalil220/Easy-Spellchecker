@@ -18,6 +18,7 @@ if not exist "%VENV_PY%" (
 
 call "%VENV_PY%" -m pip install --upgrade pip setuptools wheel || goto :teardown
 call "%VENV_PY%" -m pip install -r requirements.txt || goto :teardown
+call "%VENV_PY%" -m pip install -e . || goto :teardown
 call "%VENV_PY%" -m pip install nuitka || goto :teardown
 
 set "OUT_DIR=build\windows"
