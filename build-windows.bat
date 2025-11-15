@@ -35,14 +35,14 @@ popd
 exit /b %errorlevel%
 
 :build_core
-"%VENV_PY%" -m nuitka --standalone --onefile %PACKAGE_SWITCH% --output-dir="%OUT_DIR%" src\easyspell\core_app.py || goto :error
+"%VENV_PY%" -m nuitka --standalone %PACKAGE_SWITCH% --output-dir="%OUT_DIR%" src\easyspell\core_app.py || goto :error
 call :cleanup core_app
 exit /b 0
 :error
 exit /b 1
 
 :build_tray
-"%VENV_PY%" -m nuitka --standalone --onefile %PACKAGE_SWITCH% --include-data-file="%OUT_DIR%\core_app.exe=core_app.exe" --output-dir="%OUT_DIR%" src\easyspell\tray_service.py || goto :error
+"%VENV_PY%" -m nuitka --standalone %PACKAGE_SWITCH% --include-data-file="%OUT_DIR%\core_app.exe=core_app.exe" --output-dir="%OUT_DIR%" src\easyspell\tray_service.py || goto :error
 call :cleanup tray_service
 exit /b 0
 
