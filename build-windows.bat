@@ -22,6 +22,7 @@ call "%VENV_PY%" -m pip install nuitka || goto :teardown
 
 set "OUT_DIR=build\windows"
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
+set "PACKAGE_SWITCH=--include-package=easyspell --include-package-data=easyspell --include-package-data=symspellpy"
 
 call :build_core || goto :teardown
 call :build_tray || goto :teardown
@@ -33,14 +34,14 @@ popd
 exit /b %errorlevel%
 
 :build_core
-"%VENV_PY%" -m nuitka --standalone --onefile --enable-plugin=tk-inter --output-dir="%OUT_DIR%" src\easyspell\core_app.py || goto :error
+"%VENV_PY%" -m nuitka --standalone --onefile %PACKAGE_SWITCH% --output-dir="%OUT_DIR%" src\easyspell\core_app.py || goto :error
 call :cleanup core_app
 exit /b 0
 :error
 exit /b 1
 
 :build_tray
-"%VENV_PY%" -m nuitka --standalone --onefile --output-dir="%OUT_DIR%" src\easyspell\tray_service.py || goto :error
+"%VENV_PY%" -m nuitka --standalone --onefile %PACKAGE_SWITCH% --output-dir="%OUT_DIR%" src\easyspell\tray_service.py || goto :error
 call :cleanup tray_service
 exit /b 0
 

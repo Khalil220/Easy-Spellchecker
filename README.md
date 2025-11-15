@@ -15,6 +15,7 @@ Easy Spellchecker is a screen-reader-first spelling companion for Windows. It ru
    ```bash
    python -m venv .venv
    .venv\Scripts\pip install -r requirements.txt
+   .venv\Scripts\pip install -e .
    ```
 3. Run the tray service while developing:
    ```bash
