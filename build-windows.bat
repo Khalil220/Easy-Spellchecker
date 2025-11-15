@@ -23,7 +23,7 @@ call "%VENV_PY%" -m pip install nuitka || goto :teardown
 
 set "OUT_DIR=build\windows"
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
-set "PACKAGE_SWITCH=--include-package=easyspell --include-package-data=easyspell --include-package-data=symspellpy"
+set "PACKAGE_SWITCH=--include-package=easyspell --include-package-data=easyspell --include-package-data=symspellpy --windows-disable-console"
 
 call :build_app || goto :teardown
 
